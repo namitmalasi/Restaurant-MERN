@@ -6,16 +6,17 @@ import isEmail from "validator/lib/isEmail";
 import isEmpty from "validator/lib/isEmpty";
 import equals from "validator/lib/equals";
 import { showLoading } from "../helpers/loading";
+import { signup } from "../api/auth";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
-    password2: "",
+    username: "namit",
+    email: "namitmalasi@gmail.com",
+    password: "123",
+    password2: "123",
     successMsg: false,
     errorMsg: false,
-    loading: true,
+    loading: false,
   });
 
   const {
@@ -63,10 +64,31 @@ const Signup = () => {
         errorMsg: "Paswordsdo not match",
       });
     } else {
-      setFormData({
-        ...formData,
-        successMsg: "Validation successful",
-      });
+      const { username, email, password } = formData;
+      const data = { username, email, password };
+
+      setFormData({ ...formData, loading: true });
+
+      signup(data)
+        .then((response) => {
+          console.log(response);
+          setFormData({
+            username: "",
+            email: "",
+            password: "",
+            password2: "",
+            loading: false,
+            successMsg: response.data.successMessage,
+          });
+        })
+        .catch((error) => {
+          console.log("axios signup error : ", error);
+          setFormData({
+            ...formData,
+            loading: false,
+            errorMsg: error.response.data.errorMessage,
+          });
+        });
     }
   };
 
